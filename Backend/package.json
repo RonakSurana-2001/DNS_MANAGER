@@ -1,0 +1,27 @@
+{
+  "name": "dns-manager-backend",
+  "version": "1.0.0",
+  "description": "this is dns-manager-backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RonakSurana-2001/DNS-Manager.git"
+  },
+  "author": "Ronak Surana",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RonakSurana-2001/DNS-Manager/issues"
+  },
+  "homepage": "https://github.com/RonakSurana-2001/DNS-Manager#readme",
+  "dependencies": {
+    "@aws-sdk/client-route-53": "^3.582.0",
+    "aws-sdk": "^2.1626.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.0",
+    "zod": "^3.23.8"
+  }
+}
