@@ -3,10 +3,10 @@ const { Route53Client, ListResourceRecordSetsCommand,ChangeResourceRecordSetsCom
 const zod = require("zod")
 
 const config = {
-    region: 'ap-south-1',
+    region: process.env.AWS_REGION,
     credentials: {
-        accessKeyId: 'AKIA4M5OKB5WV6O5SXNA',
-        secretAccessKey: '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'
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     }
 };
 
