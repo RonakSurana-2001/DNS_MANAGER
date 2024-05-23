@@ -24,20 +24,20 @@ function Modal({ show, onClose }) {
     console.log(domainInfo)
   }
 
-  const handleSubmit = async() => {
-    try{
-      const {data}=await axios.post("http://localhost:3000/hostedZones/createZone",{
-        domainName:domainInfo.domainName,
-        description:domainInfo.description,
-        isPrivate:domainInfo.isPrivate
+  const handleSubmit = async () => {
+    try {
+      const { data } = await axios.post("http://localhost:3000/hostedZones/createZone", {
+        domainName: domainInfo.domainName,
+        description: domainInfo.description,
+        isPrivate: domainInfo.isPrivate
       })
-      if(data.success){
+      if (data.success) {
         console.log(data.message)
       }
-      else{
+      else {
         console.error("Not Created")
       }
-    }catch(error){
+    } catch (error) {
       console.log("Some Error Occurred")
     }
   }
@@ -154,6 +154,10 @@ function MainDnsPage() {
 
   const [showModal, setShowModal] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+
+
   const getAllHostZoneNames = async () => {
     const { data } = await axios.get("http://localhost:3000/hostedZones/listAllZone")
     console.log(data.message.HostedZones)
@@ -170,7 +174,7 @@ function MainDnsPage() {
         hostedZoneId: hId
       })
       if (data.success) {
-        getAllHostZoneNames()
+        await getAllHostZoneNames()
       }
       else {
         console.log("Some Error")
@@ -187,12 +191,26 @@ function MainDnsPage() {
   };
 
 
+  const filteredDomains = hostedDomainNames.filter(record =>
+    record.Name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    record.Config.Comment.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+
   return (
     <>
       <Modal show={showModal} onClose={toggleModal} />
       <div className='flex flex-col my-4 mx-3'>
         <div className='flex flex-row space-x-3'>
-          <button style={{ backgroundColor: "orange", padding: "10px" }} onClick={toggleModal}>Create Hosted Zones</button>
+          <button style={{ backgroundColor: "orange", padding: "10px",borderRadius:"5px" }} onClick={toggleModal}>Create Hosted Zones</button>
+          <input
+            type="text"
+            placeholder="Search domain names or comments..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="p-2 border border-gray-300 rounded-lg w-4/12"
+          />
+
         </div>
         <div className='mx-3 my-10'>
           <table style={{ borderCollapse: "collapse", width: "100%" }}>
@@ -207,14 +225,14 @@ function MainDnsPage() {
               </tr>
             </thead>
             <tbody>
-              {hostedDomainNames?.length > 0 ? (hostedDomainNames.map((record, index) =>
+              {filteredDomains?.length > 0 ? (filteredDomains.map((record, index) =>
                 <tr key={index} style={{ border: '2px solid black' }}>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}><Link to={record.Name}>{record.Name}</Link></td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.Config.PrivateZone == false ? "Public" : "Private"}</td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.ResourceRecordSetCount}</td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.Config.Comment.length == 0 ? "-" : record.Config.Comment}</td>
-                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}><FaRegEdit /></td>
-                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }} onClick={() => deleteDomain(record.Id)}><MdDelete /></td>
+                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center',cursor:"pointer" }}><FaRegEdit /></td>
+                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center',cursor:"pointer" }} onClick={() => deleteDomain(record.Id)}><MdDelete /></td>
                 </tr>
               )) : (
                 <tr>
