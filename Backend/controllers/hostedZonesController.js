@@ -1,5 +1,5 @@
 const { Route53Client, CreateHostedZoneCommand, DeleteHostedZoneCommand, ListHostedZonesByNameCommand } = require("@aws-sdk/client-route-53");
-const zod=require("zod")
+const zod = require("zod")
 
 const config = {
     region: process.env.AWS_REGION,
@@ -13,62 +13,67 @@ const client = new Route53Client(config);
 
 const createHostedZone = async (req, res) => {
 
-    const hzData=zod.object({
-        domainName:zod.string({
+    const hzData = zod.object({
+        domainName: zod.string({
             required_error: "Name is required",
             invalid_type_error: "Name must be a string",
-          }),
-        description:zod.string().optional()
+        }),
+        description: zod.string().optional()
     })
 
-    const validate=hzData.safeParse(req.body);
+    const validate = hzData.safeParse(req.body);
 
-    if(validate.success){
-        const { domainName, description} = req.body
+    console.log(validate)
+
+    if (validate.success) {
+        const { domainName, description,isPrivate } = req.body
         try {
             const input = {
                 CallerReference: new Date().toString(),
                 Name: domainName,
                 HostedZoneConfig: {
-                    Comment: description
+                    Comment: description,
+                    PrivateZone: isPrivate
                 },
             };
             const client = new Route53Client(config);
             const command = new CreateHostedZoneCommand(input);
             const response = await client.send(command);
             res.send({
-                success:true,
-                message:response
+                success: true,
+                message: response
             })
         } catch (error) {
+            console.log(error)
             res.send({
-                success:false,
-                message:error
+                success: false,
+                message: error
             })
         }
     }
-    else{
+    else {
+        console.log(validate.error)
         res.send({
-            success:false,
-            message:"Some Error Occurred"
+            success: false,
+            message: "Some Error Occurred"
         })
     }
 }
 
 const deleteHostedZone = async (req, res) => {
 
-    const hzData=zod.object({
-        hostedZoneId:zod.string({
+    const hzData = zod.object({
+        hostedZoneId: zod.string({
             required_error: "Id is required",
             invalid_type_error: "ID must be a string",
-          })
+        })
     })
 
-    const validate=hzData.safeParse(req.body);
+    const validate = hzData.safeParse(req.body);
 
-    if(validate.success){
+    if (validate.success) {
 
-        const {hostedZoneId}=req.body
+        const { hostedZoneId } = req.body
         try {
             const input = {
                 Id: hostedZoneId,
@@ -76,20 +81,20 @@ const deleteHostedZone = async (req, res) => {
             const command = new DeleteHostedZoneCommand(input);
             const response = await client.send(command);
             res.send({
-                success:true,
-                message:response
+                success: true,
+                message: response
             })
         } catch (error) {
             res.send({
-                success:false,
-                message:"Some Error Occurred"
+                success: false,
+                message: "Some Error Occurred"
             })
         }
     }
-    else{
+    else {
         res.send({
-            success:false,
-            message:validate.error
+            success: false,
+            message: validate.error
         })
     }
 
@@ -97,21 +102,21 @@ const deleteHostedZone = async (req, res) => {
 
 const listHostedZone = async (req, res) => {
 
-    const hzData=zod.object({
-        domainName:zod.string({
+    const hzData = zod.object({
+        domainName: zod.string({
             required_error: "Name is required",
             invalid_type_error: "Name must be a string",
-          }),
-          hostedZoneId:zod.string({
+        }),
+        hostedZoneId: zod.string({
             required_error: "Id is required",
             invalid_type_error: "Id must be a string",
-          })
+        })
     })
 
-    const validate=hzData.safeParse(req.body);
+    const validate = hzData.safeParse(req.body);
 
-    if(validate.success){
-        const { domainName, hostedZoneId} = req.body
+    if (validate.success) {
+        const { domainName, hostedZoneId } = req.body
         try {
             const input = {
                 DNSName: domainName,
@@ -120,20 +125,36 @@ const listHostedZone = async (req, res) => {
             const command = new ListHostedZonesByNameCommand(input);
             const response = await client.send(command);
             res.send({
-                success:true,
-                message:response
+                success: true,
+                message: response
             })
         } catch (error) {
             res.send({
-                success:false,
-                message:"Some Error Occurred"
+                success: false,
+                message: "Some Error Occurred"
             })
         }
     }
-    else{
+    else {
         res.send({
-            success:false,
-            message:"Some Error Occurred"
+            success: false,
+            message: "Some Error Occurred"
+        })
+    }
+}
+
+const listAllHostedZone = async (req, res) => {
+    try {
+        const command = new ListHostedZonesByNameCommand();
+        const response = await client.send(command);
+        res.send({
+            success: true,
+            message: response
+        })
+    } catch (error) {
+        res.send({
+            success: false,
+            message: "Some Error Occurred"
         })
     }
 }
@@ -141,5 +162,6 @@ const listHostedZone = async (req, res) => {
 module.exports = {
     createHostedZone,
     deleteHostedZone,
-    listHostedZone
+    listHostedZone,
+    listAllHostedZone
 };
