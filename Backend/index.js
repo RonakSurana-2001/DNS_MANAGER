@@ -3,8 +3,11 @@ const app=express()
 const port=process.env.PORT || 3000
 const cors=require('cors')
 const dotenv=require('dotenv')
+const connectToDb = require('./db/db.js')
 
 dotenv.config()
+
+connectToDb()
 
 app.use(express.json())
 app.use(cors())

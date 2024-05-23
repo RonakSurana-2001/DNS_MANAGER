@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
-const {sampleFunc}  = require("../controllers/userController");
-const {sampleFunc2}  = require("../controllers/userController");
+const {getAllUsers,userRegister,userLogin}=require("../controllers/userController")
 
-router.get("/welcome", sampleFunc);
+
+router.get("/getAllUsers",getAllUsers)
+router.post("/userRegister",userRegister)
+router.post("/userLogin",userLogin)
+
 
 module.exports = router;
