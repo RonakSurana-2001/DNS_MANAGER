@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const {getAllUsers,userRegister,userLogin}=require("../controllers/userController")
+const {validateUserIsLogin,userRegister,userLogin}=require("../controllers/userController")
 
 
-router.get("/getAllUsers",getAllUsers)
+router.get("/validateUserIsLogin",validateUserIsLogin)
 router.post("/userRegister",userRegister)
 router.post("/userLogin",userLogin)
 

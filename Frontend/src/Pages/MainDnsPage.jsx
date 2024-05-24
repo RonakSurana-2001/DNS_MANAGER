@@ -227,7 +227,7 @@ function MainDnsPage() {
             <tbody>
               {filteredDomains?.length > 0 ? (filteredDomains.map((record, index) =>
                 <tr key={index} style={{ border: '2px solid black' }}>
-                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}><Link to={'/dnsRecords'+record.Id} target='__blank'>{record.Name}</Link></td>
+                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}><Link to={'/dnsRecords'+record.Id}>{record.Name}</Link></td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.Config.PrivateZone == false ? "Public" : "Private"}</td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.ResourceRecordSetCount}</td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.Config.Comment.length == 0 ? "-" : record.Config.Comment}</td>

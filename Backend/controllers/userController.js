@@ -2,25 +2,7 @@ const bcrypt = require("bcryptjs")
 const userModel = require("../models/userModel")
 const zod=require("zod")
 
-
-const getAllUsers = async (req, res) => {
-    try {
-        const users = await userModel.find({});
-        return res.status(200).send({
-            userCount: users.length,
-            success: true,
-            message: "all users data",
-            users,
-        })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).send({
-            success: false,
-            message: "Error in get all users",
-            RangeError
-        })
-    }
-}
+const {generateJwtToken}=require("../middleware/jwt.js")
 
 const userRegister = async (req, res) => {
     try {
@@ -103,6 +85,7 @@ const userLogin = async (req, res) => {
                 })
             }
             const isMatch = await bcrypt.compare(password, user.password)
+            // console.log(isMatch)
             if (!isMatch) {
                 return res.status(401).send({
                     success: false,
@@ -112,11 +95,11 @@ const userLogin = async (req, res) => {
             return res.status(200).send({
                 success: true,
                 message: "login successfully",
-                user
+                jwtToken:generateJwtToken(req.body)
             })
         }
         else{
-            return res.status(400).send({
+            return res.status(500).send({
                 success: false,
                 message: "Enter Correct Credentials"
             })
@@ -132,4 +115,10 @@ const userLogin = async (req, res) => {
     }
 }
 
-module.exports = { getAllUsers, userRegister,userLogin }
+const validateUserIsLogin=(req,res)=>{
+    return res.status(200).send({
+        success:true
+    })
+}
+
+module.exports = { validateUserIsLogin, userRegister,userLogin }

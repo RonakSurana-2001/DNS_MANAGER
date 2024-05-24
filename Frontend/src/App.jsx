@@ -3,16 +3,25 @@ import LoginPage from "./Pages/LoginPage";
 import MainDnsPage from "./Pages/MainDnsPage";
 import MainRecordsPage from "./Pages/MainRecordsPage";
 import Navbar from "./Pages/Navbar";
+import  { Toaster } from 'react-hot-toast';
+import RegisterPage from "./Pages/RegisterPage";
+import {useSelector} from "react-redux"
 
 function MainLayout() {
+
   const location = useLocation();
+
+  const isLogin=useSelector((state)=>state.isLogin)
+  
   return (
     <>
-      {location.pathname !== '/' && <Navbar />}
+    <Toaster />
+      {location.pathname !== '/' && location.pathname !== '/register' && <Navbar />}
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/dnsEntry" element={<MainDnsPage />} />
-        <Route path="/dnsRecords/hostedzone/:id" element={<MainRecordsPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dnsEntry" element={isLogin?<MainDnsPage />:<LoginPage />} />
+        <Route path="/dnsRecords/hostedzone/:id" element={isLogin?<MainRecordsPage />:<LoginPage/>} />
       </Routes>
     </>
   );
