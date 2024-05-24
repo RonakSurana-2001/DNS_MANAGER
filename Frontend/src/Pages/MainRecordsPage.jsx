@@ -4,7 +4,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import "../../Styles/dropdowncontent.css"
 
-function Modal({ show, onClose,getAllRecordNames }) {
+function Modal({ show, onClose, getAllRecordNames }) {
   if (!show) {
     return null;
   }
@@ -192,21 +192,26 @@ function MainRecordsPage() {
     getAllRecordNames()
   }, [])
 
-  const deleteDomain = async (hId) => {
+  const deleteDomain = async (record) => {
     try {
-      const { data } = await axios.post("http://localhost:3000/hostedZones/deleteZone", {
-        hostedZoneId: hId
+      const { data } = await axios.post("http://localhost:3000/dnsRecords/deleteRecord", {
+        dnsName: record.Name,
+        recordValue: record.ResourceRecords[0].Value,
+        ttl: Number(record.TTL),
+        type: record.Type,
+        hostedZoneId: window.location.pathname.slice(23)
       })
       if (data.success) {
-        await getAllHostZoneNames()
+        await getAllRecordNames()
       }
       else {
-        console.log("Some Error")
+        console.log(data.message)
+        // alert("Unable to Delete")
       }
     } catch (error) {
       console.log(error)
+      // alert("Some Error Occurred")
     }
-    console.log(hId)
   }
 
 
@@ -230,7 +235,7 @@ function MainRecordsPage() {
 
   return (
     <>
-      <Modal show={showModal} onClose={toggleModal} getAllRecordNames={getAllRecordNames}/>
+      <Modal show={showModal} onClose={toggleModal} getAllRecordNames={getAllRecordNames} />
       <div className='flex flex-col my-4 mx-3'>
         <div className='flex flex-row space-x-3'>
           <button style={{ backgroundColor: "orange", padding: "10px", borderRadius: "5px" }} onClick={toggleModal}>Create Record</button>
@@ -269,7 +274,7 @@ function MainRecordsPage() {
                   }</td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.TTL}</td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center', cursor: "pointer" }}><FaRegEdit /></td>
-                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center', cursor: "pointer" }}><MdDelete /></td>
+                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center', cursor: "pointer" }} onClick={()=>deleteDomain(record)}><MdDelete /></td>
                 </tr>
               )) : (
                 <tr>
