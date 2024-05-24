@@ -14,18 +14,12 @@ const client = new Route53Client(config);
 
 const listRecords = async (req, res) => {
 
-    const hzData = zod.object({
-        hostedZoneId: zod.string({
-            required_error: "Id is required",
-            invalid_type_error: "Id must be a string",
-        })
-    })
+    const hzData = zod.string()
 
-    const validate = hzData.safeParse(req.body);
-
+    const validate = hzData.safeParse(req.params.id);
     if (validate.success) {
         try {
-            const { hostedZoneId } = req.body
+            const  hostedZoneId  = req.params.id
             const input = { // ListResourceRecordSetsRequest
                 HostedZoneId: hostedZoneId, // required
             };

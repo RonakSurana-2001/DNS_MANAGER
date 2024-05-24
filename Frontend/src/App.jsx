@@ -12,7 +12,7 @@ function MainLayout() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/dnsEntry" element={<MainDnsPage />} />
-        <Route path="/dnsRecords" element={<MainRecordsPage />} />
+        <Route path="/dnsRecords/hostedzone/:id" element={<MainRecordsPage />} />
       </Routes>
     </>
   );
