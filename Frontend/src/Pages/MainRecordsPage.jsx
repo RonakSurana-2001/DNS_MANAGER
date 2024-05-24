@@ -1,47 +1,64 @@
 import React, { useEffect, useState } from 'react'
 import axios from "axios"
-import { Link } from 'react-router-dom'
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import "../../Styles/dropdowncontent.css"
 
-
-function Modal({ show, onClose }) {
+function Modal({ show, onClose,getAllRecordNames }) {
   if (!show) {
     return null;
   }
 
+  const [currType, setcurrType] = useState("Select Type")
+
   const [domainInfo, setdomainInfo] = useState({
     domainName: "",
-    description: "",
-    isPrivate: false
+    recordValue: "",
+    ttl: "",
+    type: currType,
+    hostedZoneId: window.location.pathname.slice(23)
   })
 
+
+  const [isOpen, setisOpen] = useState(false)
+
+  useEffect(() => {
+    setdomainInfo(prevState => ({
+      ...prevState,
+      type: currType
+    }));
+  }, [currType]);
+
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
     setdomainInfo((prevState) => ({
       ...prevState,
-      [name]: type === 'checkbox' ? checked : value
+      [e.target.name]: e.target.value
     }));
-    console.log(domainInfo)
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     try {
-      const { data } = await axios.post("http://localhost:3000/hostedZones/createZone", {
-        domainName: domainInfo.domainName,
-        description: domainInfo.description,
-        isPrivate: domainInfo.isPrivate
+      const { data } = await axios.post("http://localhost:3000/dnsRecords/createRecord", {
+        dnsName: domainInfo.domainName,
+        recordValue: domainInfo.recordValue,
+        ttl: Number(domainInfo.ttl),
+        type: domainInfo.type,
+        hostedZoneId: domainInfo.hostedZoneId
       })
       if (data.success) {
-        console.log(data.message)
+        getAllRecordNames();
+        onClose();
       }
       else {
-        console.error("Not Created")
+        alert("Not Created")
       }
     } catch (error) {
-      console.log("Some Error Occurred")
+      alert("Enter Credentials Correctly")
     }
   }
+
+  const listType = ['A', 'AAAA', 'CNAME', 'MX', ' NS', 'PTR', 'SOA', 'SRV', 'TXT', 'DS']
 
   return (
     <div
@@ -50,11 +67,11 @@ function Modal({ show, onClose }) {
       aria-hidden="true"
       className="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto overflow-x-hidden bg-black bg-opacity-50"
     >
-      <div className="relative w-full max-w-md p-4 max-h-full">
+      <div className="relative w-full max-w-md p-4 max-h-full mb-20">
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Create Hosted Zone
+              Create Record
             </h3>
             <button
               type="button"
@@ -103,43 +120,50 @@ function Modal({ show, onClose }) {
                   htmlFor="description"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Description
+                  Record Value
                 </label>
                 <input
                   type="text"
-                  name="description"
-                  id="description"
-                  placeholder="Something..."
-                  value={domainInfo.description}
+                  name="recordValue"
+                  id="recordValue"
+                  placeholder="1.1.1.1"
+                  value={domainInfo.recordValue}
                   onChange={handleChange}
                   className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 />
               </div>
-              <div className="flex justify-between">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="isPrivate"
-                      name="isPrivate"
-                      type="checkbox"
-                      onChange={handleChange}
-                      checked={domainInfo.isPrivate}
-                      className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-600 dark:border-gray-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
-                    />
-                  </div>
-                  <label
-                    htmlFor="isPrivate"
-                    className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                  >
-                    Mark Private
-                  </label>
+              <div>
+                <label
+                  htmlFor="ttl"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  TTL
+                </label>
+                <input
+                  type="text"
+                  name="ttl"
+                  id="ttl"
+                  placeholder="1-300"
+                  value={domainInfo.ttl}
+                  onChange={handleChange}
+                  className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                />
+              </div>
+              <div>
+                <div className="dropdown">
+                  <button id="dropdownButton" className="dropdown-toggle" type="button" onClick={() => setisOpen(!isOpen)}>{currType}</button>
+                  {isOpen && <div id="dropdownContent" className="dropdown-content">
+                    {listType.map((val, id) =>
+                      <div key={id} onClick={() => setcurrType(val)}>{val}</div>
+                    )}
+                  </div>}
                 </div>
               </div>
               <button
                 type="submit"
                 className="w-full px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
-                Create Hosted Zone
+                Create Record
               </button>
             </form>
           </div>
@@ -159,9 +183,8 @@ function MainRecordsPage() {
 
 
 
-  const getAllRecordNames = async () => {
+  const getAllRecordNames = async (e) => {
     const { data } = await axios.post(`http://localhost:3000/dnsRecords/listRecords/${window.location.pathname.slice(23)}`)
-    console.log(data.message.ResourceRecordSets)
     sethostedDomainNames(data.message.ResourceRecordSets)
   }
 
@@ -169,27 +192,27 @@ function MainRecordsPage() {
     getAllRecordNames()
   }, [])
 
-  // const deleteDomain = async (hId) => {
-  //   try {
-  //     const { data } = await axios.post("http://localhost:3000/hostedZones/deleteZone", {
-  //       hostedZoneId: hId
-  //     })
-  //     if (data.success) {
-  //       await getAllHostZoneNames()
-  //     }
-  //     else {
-  //       console.log("Some Error")
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  //   console.log(hId)
-  // }
+  const deleteDomain = async (hId) => {
+    try {
+      const { data } = await axios.post("http://localhost:3000/hostedZones/deleteZone", {
+        hostedZoneId: hId
+      })
+      if (data.success) {
+        await getAllHostZoneNames()
+      }
+      else {
+        console.log("Some Error")
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    console.log(hId)
+  }
 
 
-  // const toggleModal = () => {
-  //   setShowModal(!showModal);
-  // };
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  };
 
 
   const filteredDomains = hostedDomainNames.filter((record) => {
@@ -207,10 +230,10 @@ function MainRecordsPage() {
 
   return (
     <>
-      {/* <Modal show={showModal} onClose={toggleModal} /> */}
+      <Modal show={showModal} onClose={toggleModal} getAllRecordNames={getAllRecordNames}/>
       <div className='flex flex-col my-4 mx-3'>
         <div className='flex flex-row space-x-3'>
-          <button style={{ backgroundColor: "orange", padding: "10px", borderRadius: "5px" }}>Create Record</button>
+          <button style={{ backgroundColor: "orange", padding: "10px", borderRadius: "5px" }} onClick={toggleModal}>Create Record</button>
           <input
             type="text"
             placeholder="Search by Record Name or Value/Route traffic to..."

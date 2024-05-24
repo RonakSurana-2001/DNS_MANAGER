@@ -46,7 +46,6 @@ const listRecords = async (req, res) => {
 }
 
 const createRecord = async (req, res) => {
-
     const hzData = zod.object({
         dnsName:zod.string({
             required_error: "Name is required",
@@ -102,6 +101,7 @@ const createRecord = async (req, res) => {
                 message: response
             })
         } catch (error) {
+            console.log(error)
             res.send({
                 success: false,
                 message: error
@@ -109,6 +109,7 @@ const createRecord = async (req, res) => {
         }
     }
     else {
+        console.log(error)
         res.send({
             success: false,
             message: validate.error
