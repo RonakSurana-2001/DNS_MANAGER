@@ -5,6 +5,8 @@ import { MdDelete } from "react-icons/md";
 import "../../Styles/dropdowncontent.css"
 import toast from 'react-hot-toast';
 import ReactLoading from 'react-loading';
+import Papa from 'papaparse';
+
 
 function Modal({ show, onClose, getAllRecordNames }) {
   if (!show) {
@@ -63,7 +65,7 @@ function Modal({ show, onClose, getAllRecordNames }) {
     }
   }
 
-  const listType = ['A', 'AAAA', 'CNAME', 'MX', ' NS', 'PTR', 'SOA', 'SRV', 'TXT', 'DS']
+  const listType = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT', 'DS']
 
   return (
     <div
@@ -366,6 +368,10 @@ function MainRecordsPage() {
 
   const [loading, setLoading] = useState(false)
 
+  const [csvData, setCsvData] = useState([]);
+  const [jsonData, setJsonData] = useState([]);
+
+
 
 
   const getAllRecordNames = async (e) => {
@@ -430,6 +436,75 @@ function MainRecordsPage() {
     return false;
   });
 
+  const UploadFn = (event) => {
+    const file = event.target.files[0];
+    const fileType =
+      file.name.split('.').pop().toLowerCase();
+    if (fileType !== 'csv' && fileType !== 'json') {
+      toast.error('Please upload a CSV or json file.');
+      return;
+    }
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const fileContent = e.target.result;
+
+      if (fileType === 'csv') {
+        Papa.parse(fileContent, {
+          complete: (result) => {
+            setCsvData(result.data);
+          },
+          header: true,
+        });
+      } else if (fileType === 'json') {
+        const parsedData = JSON.parse(fileContent);
+        setJsonData(parsedData);
+        setCsvData(parsedData)
+      }
+    };
+    reader.readAsText(file);
+  };
+
+
+  const conversionFn = async () => {
+    const res = JSON.stringify(csvData, null, 2);
+    setJsonData(res);
+    const jsonParsed = JSON.parse(res);
+    console.log(jsonParsed)
+    if (jsonParsed.length > 0) {
+      jsonParsed.map((data) =>
+        uploadHostedZones(data)
+      )
+    }
+    await window.location.reload()
+  };
+
+  const uploadHostedZones = async (domainInfo) => {
+    console.log(domainInfo)
+    const dns = domainInfo.recordValue.split(',');
+    const formattedRecords = dns.map(record => ({ Value: record }));
+    console.log(formattedRecords)
+    try {
+      const { data } = await axios.post("http://localhost:3000/dnsRecords/createRecord", {
+        dnsName: domainInfo.domainName,
+        recordValue: formattedRecords,
+        ttl: Number(domainInfo.ttl),
+        type: domainInfo.type,
+        hostedZoneId: window.location.pathname.slice(23)
+      })
+      if (data.success) {
+        console.log(data.message)
+      }
+      else {
+        console.error("Not Created")
+      }
+    } catch (error) {
+      console.log("Some Error Occurred")
+    }
+  }
+
+  
+
 
   return (
     <>
@@ -441,6 +516,37 @@ function MainRecordsPage() {
       <div className='flex flex-col my-4 mx-3'>
         <div className='flex flex-row space-x-3'>
           <button style={{ backgroundColor: "orange", padding: "10px", borderRadius: "5px" }} onClick={toggleModal}>Create Record</button>
+
+          <div className='w-80 flex flex-row justify-between bg-slate-500'>
+            <input
+              type="file"
+              onChange={UploadFn}
+              style={{
+                padding: "10px",
+                width: "200px",
+                cursor: "pointer",
+                color: "black",
+                textAlign: "center",
+              }}
+            />
+            <button
+              className="button"
+              onClick={conversionFn}
+              style={{
+                backgroundColor: "blue",
+                color: "white",
+                padding: "10px 20px",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontSize: "16px"
+              }}
+            >
+              Upload
+            </button>
+          </div>
+
+
           <input
             type="text"
             placeholder="Search by Record Name or Value/Route traffic to..."

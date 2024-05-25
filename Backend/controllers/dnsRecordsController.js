@@ -67,8 +67,23 @@ const createRecord = async (req, res) => {
 
     const validate = hzData.safeParse(req.body);
 
+    function formatUrlForRoute53(url) {
+        // Define a mapping of characters to their ASCII escape sequences
+        const escapeMap = {
+            ':': '\\072',
+            '/': '\\057'
+        };
+    
+        // Use a regular expression to replace each character in the URL
+        const formattedUrl = url.replace(/[:\/]/g, match => escapeMap[match]);
+    
+        return formattedUrl;
+    }
+
     if (validate.success) {
         const { dnsName, recordValue, ttl, type, hostedZoneId } = req.body
+        const formattedUrl = formatUrlForRoute53(dnsName);
+        console.log(req.body)
         try {
             const input = {
                 ChangeBatch: {
@@ -76,7 +91,7 @@ const createRecord = async (req, res) => {
                         {
                             Action: "CREATE",
                             ResourceRecordSet: {
-                                Name: dnsName,
+                                Name: formattedUrl,
                                 ResourceRecords: recordValue,
                                 TTL: ttl,
                                 Type: type

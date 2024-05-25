@@ -392,6 +392,20 @@ function MainDnsPage() {
     }
   }
 
+  function unformatUrl(formattedUrl) {
+    // Define a mapping of ASCII escape sequences to their characters
+    const unescapeMap = {
+      '\\072': ':',
+      '\\057': '/'
+    };
+
+    // Use a regular expression to replace each escape sequence in the URL
+    const standardUrl = formattedUrl.replace(/\\072|\\057/g, match => unescapeMap[match]);
+
+    return standardUrl;
+  }
+
+
 
   return (
     <>
@@ -440,7 +454,7 @@ function MainDnsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="p-2 border border-gray-300 rounded-lg w-4/12"
-          />
+          /> 
         </div>
         <div className='mx-3 my-10'>
           <table style={{ borderCollapse: "collapse", width: "100%" }}>
