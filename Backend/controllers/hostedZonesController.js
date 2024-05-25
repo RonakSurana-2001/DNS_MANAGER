@@ -1,4 +1,4 @@
-const { Route53Client, CreateHostedZoneCommand, DeleteHostedZoneCommand, ListHostedZonesByNameCommand } = require("@aws-sdk/client-route-53");
+const { Route53Client, CreateHostedZoneCommand, DeleteHostedZoneCommand, ListHostedZonesByNameCommand,UpdateHostedZoneCommentCommand } = require("@aws-sdk/client-route-53");
 const zod = require("zod")
 
 const config = {
@@ -159,9 +159,31 @@ const listAllHostedZone = async (req, res) => {
     }
 }
 
+const updateHostedZone=async(req,res)=>{
+    try{
+        const client = new Route53Client(config);
+        const input = { // UpdateHostedZoneCommentRequest
+            Id: req.body.hostedZoneId, // required
+            Comment: req.body.comment,
+        };
+        const command = new UpdateHostedZoneCommentCommand(input);
+        const response = await client.send(command);
+        res.send({
+            success: true,
+            message: response
+        })
+    } catch(error){
+        res.send({
+            success: false,
+            message: "Some Error Occurred"
+        })
+    }
+}
+
 module.exports = {
     createHostedZone,
     deleteHostedZone,
     listHostedZone,
-    listAllHostedZone
+    listAllHostedZone,
+    updateHostedZone
 };

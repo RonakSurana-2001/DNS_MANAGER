@@ -51,10 +51,6 @@ const createRecord = async (req, res) => {
             required_error: "Name is required",
             invalid_type_error: "Name must be a string",
         }),
-        recordValue:zod.string({
-            required_error: "recordValue is required",
-            invalid_type_error: "recordValue must be a string",
-        }),
         ttl:zod.number({
             required_error: "TTL is required",
             invalid_type_error: "TTL must be a Number",
@@ -81,11 +77,7 @@ const createRecord = async (req, res) => {
                             Action: "CREATE",
                             ResourceRecordSet: {
                                 Name: dnsName,
-                                ResourceRecords: [
-                                    {
-                                        Value: recordValue
-                                    }
-                                ],
+                                ResourceRecords: recordValue,
                                 TTL: ttl,
                                 Type: type
                             }
@@ -126,10 +118,6 @@ const updateRecord = async (req, res) => {
             required_error: "Name is required",
             invalid_type_error: "Name must be a string",
         }),
-        recordValue:zod.string({
-            required_error: "recordValue is required",
-            invalid_type_error: "recordValue must be a string",
-        }),
         ttl:zod.number({
             required_error: "TTL is required",
             invalid_type_error: "TTL must be a Number",
@@ -156,11 +144,7 @@ const updateRecord = async (req, res) => {
                             Action: "UPSERT",
                             ResourceRecordSet: {
                                 Name: dnsName,
-                                ResourceRecords: [
-                                    {
-                                        Value: recordValue
-                                    }
-                                ],
+                                ResourceRecords: recordValue,
                                 TTL: ttl,
                                 Type: type
                             }
@@ -198,10 +182,6 @@ const deleteRecord = async (req, res) => {
             required_error: "Name is required",
             invalid_type_error: "Name must be a string",
         }),
-        recordValue:zod.string({
-            required_error: "recordValue is required",
-            invalid_type_error: "recordValue must be a string",
-        }),
         ttl:zod.number({
             required_error: "TTL is required",
             invalid_type_error: "TTL must be a Number",
@@ -228,11 +208,7 @@ const deleteRecord = async (req, res) => {
                             Action: "DELETE",
                             ResourceRecordSet: {
                                 Name: dnsName,
-                                ResourceRecords: [
-                                    {
-                                        Value: recordValue
-                                    }
-                                ],
+                                ResourceRecords:recordValue,
                                 TTL: ttl,
                                 Type: type
                             }
