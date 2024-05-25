@@ -52,7 +52,7 @@ const createHostedZone = async (req, res) => {
         }
     }
     else {
-        console.log(validate.error)
+        // console.log(validate.error)
         res.send({
             success: false,
             message: "Some Error Occurred"

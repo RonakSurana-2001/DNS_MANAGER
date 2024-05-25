@@ -5,6 +5,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import toast from 'react-hot-toast';
 import ReactLoading from 'react-loading';
+import Papa from 'papaparse';
 
 
 function Modal({ show, onClose }) {
@@ -152,20 +153,20 @@ function Modal({ show, onClose }) {
 }
 
 
-function UpdateModal({ show, onClose,domainToUpdate,getAllHostZoneNames }) {
+function UpdateModal({ show, onClose, domainToUpdate, getAllHostZoneNames }) {
   if (!show) {
     return null;
   }
 
   const [domainInfo, setdomainInfo] = useState({
-    comment:domainToUpdate.comment
+    comment: domainToUpdate.comment
   })
 
   console.log(domainInfo)
 
 
   const handleChange = (e) => {
-    const { name, value} = e.target;
+    const { name, value } = e.target;
     setdomainInfo((prevState) => ({
       ...prevState,
       [name]: value
@@ -176,7 +177,7 @@ function UpdateModal({ show, onClose,domainToUpdate,getAllHostZoneNames }) {
     // e.preventDefault()
     try {
       const { data } = await axios.post("http://localhost:3000/hostedZones/updateZone", {
-        hostedZoneId:domainToUpdate.Id,
+        hostedZoneId: domainToUpdate.Id,
         comment: domainInfo.comment
       })
       if (data.success) {
@@ -269,22 +270,25 @@ function MainDnsPage() {
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
-  const [domainToUpdate,setdomainToUpdate]=useState("0")
+  const [domainToUpdate, setdomainToUpdate] = useState("0")
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [loading,setLoading]=useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const [csvData, setCsvData] = useState([]);
+  const [jsonData, setJsonData] = useState([]);
+
 
 
 
   const getAllHostZoneNames = async () => {
     const { data } = await axios.get("http://localhost:3000/hostedZones/listAllZone")
-    console.log(data.message.HostedZones)
-    if(data.success){
+    if (data.success) {
       sethostedDomainNames(data.message.HostedZones)
       setLoading(false)
     }
-    else{
+    else {
       toast.error("Unable to Load please try again later")
       setLoading(false)
     }
@@ -327,17 +331,109 @@ function MainDnsPage() {
     record.Config.Comment.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const UploadFn = (event) => {
+    const file = event.target.files[0];
+    const fileType =
+      file.name.split('.').pop().toLowerCase();
+    if (fileType !== 'csv' && fileType !== 'json') {
+      toast.error('Please upload a CSV or json file.');
+      return;
+    }
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const fileContent = e.target.result;
+
+      if (fileType === 'csv') {
+        Papa.parse(fileContent, {
+          complete: (result) => {
+            setCsvData(result.data);
+          },
+          header: true,
+        });
+      } else if (fileType === 'json') {
+        const parsedData = JSON.parse(fileContent);
+        setJsonData(parsedData);
+        setCsvData(parsedData)
+      }
+    };
+    reader.readAsText(file);
+  };
+
+
+  const conversionFn =async() => {
+    const res = JSON.stringify(csvData, null, 2);
+    setJsonData(res);
+    const jsonParsed = JSON.parse(res);
+    if(jsonParsed.length>0){
+      jsonParsed.map((data)=>
+        uploadHostedZones(data)
+      )
+    }
+    await window.location.reload()
+  };
+
+  const uploadHostedZones = async (domainInfo) => {
+    console.log(domainInfo)
+    try {
+      const { data } = await axios.post("http://localhost:3000/hostedZones/createZone", {
+        domainName: domainInfo.domainName,
+        description: (domainInfo.Comment).length<0?"":domainInfo.Comment,
+        isPrivate: false
+      })
+      if (data.success) {
+        console.log(data.message)
+      }
+      else {
+        console.error("Not Created")
+      }
+    } catch (error) {
+      console.log("Some Error Occurred")
+    }
+  }
+
 
   return (
     <>
 
       <Modal show={showModal} onClose={toggleModal} />
 
-      <UpdateModal show={showUpdateModal} onClose={toggleUpdateModal} domainToUpdate={domainToUpdate} getAllHostZoneNames={getAllHostZoneNames}/>
+      <UpdateModal show={showUpdateModal} onClose={toggleUpdateModal} domainToUpdate={domainToUpdate} getAllHostZoneNames={getAllHostZoneNames} />
 
       <div className='flex flex-col my-4 mx-3'>
         <div className='flex flex-row space-x-3'>
           <button style={{ backgroundColor: "orange", padding: "10px", borderRadius: "5px" }} onClick={toggleModal}>Create Hosted Zones</button>
+
+          <div className='w-80 flex flex-row justify-between bg-slate-500'>
+            <input
+              type="file"
+              onChange={UploadFn}
+              style={{
+                padding: "10px",
+                width: "200px",
+                cursor: "pointer",
+                color: "black",
+                textAlign: "center",
+              }}
+            />
+            <button
+              className="button"
+              onClick={conversionFn}
+              style={{
+                backgroundColor: "blue",
+                color: "white",
+                padding: "10px 20px",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontSize: "16px"
+              }}
+            >
+              Upload
+            </button>
+          </div>
+
+
           <input
             type="text"
             placeholder="Search domain names or comments..."
@@ -345,7 +441,6 @@ function MainDnsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="p-2 border border-gray-300 rounded-lg w-4/12"
           />
-
         </div>
         <div className='mx-3 my-10'>
           <table style={{ borderCollapse: "collapse", width: "100%" }}>
@@ -366,20 +461,20 @@ function MainDnsPage() {
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.Config.PrivateZone == false ? "Public" : "Private"}</td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.ResourceRecordSetCount}</td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}>{record.Config.Comment.length == 0 ? "-" : record.Config.Comment}</td>
-                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center', cursor: "pointer" }} onClick={()=>{
+                  <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center', cursor: "pointer" }} onClick={() => {
                     toggleUpdateModal()
                     setdomainToUpdate({
-                      Id:record.Id,
-                      comment:record.Config.Comment
+                      Id: record.Id,
+                      comment: record.Config.Comment
                     })
                   }}><FaRegEdit /></td>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center', cursor: "pointer" }} onClick={() => deleteDomain(record.Id)}><MdDelete /></td>
                 </tr>
               )) : (
-                (loading?<ReactLoading type={"bars"} color={"blue"} height={50} width={200} />:
-                <tr>
-                  <td>No DNS Records</td>
-                </tr>)
+                (loading ? <ReactLoading type={"bars"} color={"blue"} height={50} width={200} /> :
+                  <tr>
+                    <td>No DNS Records</td>
+                  </tr>)
               )}
             </tbody>
           </table>
