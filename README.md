@@ -78,7 +78,7 @@ In CSV for example
 ```
 | domainName | recordValue     | ttl                |type               |
 | :-------- | :------- | :------------------------- |:------------------------- |
-| `subdomain` | `1.1.1.1` | `300` |`A` |
+| `subdomain.www.domain.com` | `1.1.1.1` | `300` |`A` |
 
 
 ```
@@ -86,7 +86,7 @@ In JSON for example:
 
 [
   {
-    "domainName":"subdomain",
+    "domainName":"subdomain.www.domain.com",
     "recordValue":"1.1.1.1",
     "ttl":300,
     "type":"A"
