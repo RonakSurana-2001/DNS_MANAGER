@@ -48,7 +48,7 @@ Start the Developement Server
 npm run dev
 ```
 
-## Note
+## Information
 
 In order to upload data of domains follow these  parameters  
 ```
@@ -94,6 +94,11 @@ In JSON for example:
   and so on
 ]
 ```
+
+## Note
+As the backend is deloyed on the render free plan. It generally goes to sleep in every 15 min of inactivity. Due to this issue the Login and register user might take time. It is requested to please understand and cooperate.
+Link to render documentation: (https://docs.render.com/free#free-web-services)
+
 ## Authors
 
  [@Ronak Surana](https://www.linkedin.com/in/ronak-surana-944550205/)
