@@ -13,10 +13,18 @@ function Modal({ show, onClose }) {
     return null;
   }
 
+  const [isOpen, setisOpen] = useState(false)
+
+  const listType = ["us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "eu-central-2", "ap-east-1", "me-south-1", "us-gov-west-1", "us-gov-east-1", "us-iso-east-1", "us-iso-west-1", "us-isob-east-1", "me-central-1", "ap-southeast-1", "ap-southeast-2", "ap-southeast-3", "ap-south-1", "ap-south-2", "ap-northeast-1", "ap-northeast-2", "ap-northeast-3", "eu-north-1", "sa-east-1", "ca-central-1", "cn-north-1", "af-south-1", "eu-south-1", "eu-south-2", "ap-southeast-4", "il-central-1", "ca-west-1"]
+
+  const [currType, setcurrType] = useState("Select VPC Region")
+
   const [domainInfo, setdomainInfo] = useState({
     domainName: "",
     description: "",
-    isPrivate: false
+    isPrivate: false,
+    vpcId: "",
+    vpcRegion: currType
   })
 
   const handleChange = (e) => {
@@ -25,24 +33,52 @@ function Modal({ show, onClose }) {
       ...prevState,
       [name]: type === 'checkbox' ? checked : value
     }));
-    console.log(domainInfo)
   }
 
+  useEffect(() => {
+    setdomainInfo((prevState) => ({
+      ...prevState,
+      vpcRegion: currType,
+    }));
+  }, [currType]);
+
+
   const handleSubmit = async () => {
-    try {
-      const { data } = await axios.post("http://localhost:3000/hostedZones/createZone", {
-        domainName: domainInfo.domainName,
-        description: domainInfo.description,
-        isPrivate: domainInfo.isPrivate
-      })
-      if (data.success) {
-        console.log(data.message)
+    if (domainInfo.isPrivate == false) {
+      try {
+        const { data } = await axios.post("http://localhost:3000/hostedZones/createZone", {
+          domainName: domainInfo.domainName,
+          description: domainInfo.description,
+          isPrivate: domainInfo.isPrivate
+        })
+        if (data.success) {
+          console.log(data.message)
+        }
+        else {
+          console.error("Not Created")
+        }
+      } catch (error) {
+        console.log("Some Error Occurred")
       }
-      else {
-        console.error("Not Created")
+    }
+    else {
+      try {
+        const { data } = await axios.post("http://localhost:3000/hostedZones/createZone/privateZone", {
+          domainName: domainInfo.domainName,
+          description: domainInfo.description,
+          isPrivate: domainInfo.isPrivate,
+          vpcId: domainInfo.vpcId,
+          vpcRegion: domainInfo.vpcRegion
+        })
+        if (data.success) {
+          console.log(data.message)
+        }
+        else {
+          console.error("Not Created")
+        }
+      } catch (error) {
+        console.log("Some Error Occurred")
       }
-    } catch (error) {
-      console.log("Some Error Occurred")
     }
   }
 
@@ -138,6 +174,48 @@ function Modal({ show, onClose }) {
                   </label>
                 </div>
               </div>
+
+              {/* For Private */}
+              {domainInfo.isPrivate ?
+
+                <div>
+                  <label
+                    htmlFor="vpcId"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    VPC Id
+                  </label>
+                  <input
+                    type="text"
+                    name="vpcId"
+                    id="vpcId"
+                    placeholder="Something..."
+                    value={domainInfo.vpcId}
+                    onChange={handleChange}
+                    className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  />
+                </div>
+
+                : ""
+              }
+
+              {domainInfo.isPrivate ?
+                <div>
+                  <div className="dropdown">
+                    <button id="dropdownButton" className="dropdown-toggle" type="button" onClick={() => setisOpen(!isOpen)}>{currType}</button>
+                    {isOpen &&
+                      <div id="dropdownContent" className="dropdown-content">
+                        {listType.map((val, id) =>
+                          <div key={id} onClick={() => setcurrType(val)}>{val}</div>
+                        )}
+                      </div>
+                    }
+                  </div>
+                </div>
+                : ""}
+
+              {/*End Private*/}
+
               <button
                 type="submit"
                 className="w-full px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -294,7 +372,7 @@ function MainDnsPage() {
     const { data } = await axios.get("http://localhost:3000/hostedZones/listAllZone")
     if (data.success) {
       data.message.HostedZones.map((record) => {
-        record.Name =unformatUrl(record.Name)
+        record.Name = unformatUrl(record.Name)
       })
       sethostedDomainNames(data.message.HostedZones)
       setLoading(false)
