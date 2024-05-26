@@ -48,6 +48,52 @@ Start the Developement Server
 npm run dev
 ```
 
+## Note
+
+In order to upload data of domains these  parameters  
+```http
+In CSV for example
+```
+| domainName | Type     | Comment                |
+| :-------- | :------- | :------------------------- |
+| `www.domain.com` | `Public` | `Description` |
+
+
+```http
+In JSON for example:
+
+[
+  {
+    "domainName":"www.domain.com",
+    "Type":"A",
+    "Comment":"Some Comment"
+  },
+  and so on
+]
+```
+
+In order to upload data of DNS Records these parameters  
+```http
+In CSV for example
+```
+| domainName | recordValue     | ttl                |type               |
+| :-------- | :------- | :------------------------- |:------------------------- |
+| `subdomain` | `1.1.1.1` | `300` |`A` |
+
+
+```http
+In JSON for example:
+
+[
+  {
+    "domainName":"subdomain",
+    "recordValue":"1.1.1.1",
+    "ttl":300,
+    "type":"A"
+  },
+  and so on
+]
+```
 ## Authors
 
  [@Ronak Surana](https://www.linkedin.com/in/ronak-surana-944550205/)
