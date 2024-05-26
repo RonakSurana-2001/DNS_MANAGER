@@ -371,13 +371,26 @@ function MainRecordsPage() {
   const [csvData, setCsvData] = useState([]);
   const [jsonData, setJsonData] = useState([]);
 
+  function unformatUrl(formattedUrl) {
+    const unescapeMap = {
+      '\\072': ':',
+      '\\057': '/'
+    };
+    const standardUrl = formattedUrl.replace(/\\072|\\057/g, match => unescapeMap[match]);
+
+    return standardUrl;
+  }
 
 
 
   const getAllRecordNames = async (e) => {
     const { data } = await axios.post(`http://localhost:3000/dnsRecords/listRecords/${window.location.pathname.slice(23)}`)
     if (data.success) {
+      data.message.ResourceRecordSets.map((record)=>{
+        record.Name =unformatUrl(record.Name)
+      })
       sethostedDomainNames(data.message.ResourceRecordSets)
+      // console.log(data.message.ResourceRecordSets)
       setLoading(false)
     }
     else {

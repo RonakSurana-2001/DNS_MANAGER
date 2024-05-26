@@ -279,12 +279,23 @@ function MainDnsPage() {
   const [csvData, setCsvData] = useState([]);
   const [jsonData, setJsonData] = useState([]);
 
+  function unformatUrl(formattedUrl) {
+    const unescapeMap = {
+      '\\072': ':',
+      '\\057': '/'
+    };
+    const standardUrl = formattedUrl.replace(/\\072|\\057/g, match => unescapeMap[match]);
 
+    return standardUrl;
+  }
 
 
   const getAllHostZoneNames = async () => {
     const { data } = await axios.get("http://localhost:3000/hostedZones/listAllZone")
     if (data.success) {
+      data.message.HostedZones.map((record) => {
+        record.Name =unformatUrl(record.Name)
+      })
       sethostedDomainNames(data.message.HostedZones)
       setLoading(false)
     }
@@ -308,10 +319,10 @@ function MainDnsPage() {
         await getAllHostZoneNames()
       }
       else {
-        console.log("Some Error")
+        toast.error("Unable to delete")
       }
     } catch (error) {
-      console.log(error)
+      toast.error("Unable to delete")
     }
     // console.log(hId)
   }
@@ -361,12 +372,12 @@ function MainDnsPage() {
   };
 
 
-  const conversionFn =async() => {
+  const conversionFn = async () => {
     const res = JSON.stringify(csvData, null, 2);
     setJsonData(res);
     const jsonParsed = JSON.parse(res);
-    if(jsonParsed.length>0){
-      jsonParsed.map((data)=>
+    if (jsonParsed.length > 0) {
+      jsonParsed.map((data) =>
         uploadHostedZones(data)
       )
     }
@@ -378,7 +389,7 @@ function MainDnsPage() {
     try {
       const { data } = await axios.post("http://localhost:3000/hostedZones/createZone", {
         domainName: domainInfo.domainName,
-        description: (domainInfo.Comment).length<0?"":domainInfo.Comment,
+        description: (domainInfo.Comment).length < 0 ? "" : domainInfo.Comment,
         isPrivate: false
       })
       if (data.success) {
@@ -393,15 +404,11 @@ function MainDnsPage() {
   }
 
   function unformatUrl(formattedUrl) {
-    // Define a mapping of ASCII escape sequences to their characters
     const unescapeMap = {
       '\\072': ':',
       '\\057': '/'
     };
-
-    // Use a regular expression to replace each escape sequence in the URL
     const standardUrl = formattedUrl.replace(/\\072|\\057/g, match => unescapeMap[match]);
-
     return standardUrl;
   }
 
@@ -454,7 +461,7 @@ function MainDnsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="p-2 border border-gray-300 rounded-lg w-4/12"
-          /> 
+          />
         </div>
         <div className='mx-3 my-10'>
           <table style={{ borderCollapse: "collapse", width: "100%" }}>
