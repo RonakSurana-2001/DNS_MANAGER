@@ -46,7 +46,7 @@ function Modal({ show, onClose }) {
   const handleSubmit = async () => {
     if (domainInfo.isPrivate == false) {
       try {
-        const { data } = await axios.post("http://localhost:3000/hostedZones/createZone", {
+        const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/createZone", {
           domainName: domainInfo.domainName,
           description: domainInfo.description,
           isPrivate: domainInfo.isPrivate
@@ -63,7 +63,7 @@ function Modal({ show, onClose }) {
     }
     else {
       try {
-        const { data } = await axios.post("http://localhost:3000/hostedZones/createZone/privateZone", {
+        const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/createZone/privateZone", {
           domainName: domainInfo.domainName,
           description: domainInfo.description,
           isPrivate: domainInfo.isPrivate,
@@ -254,7 +254,7 @@ function UpdateModal({ show, onClose, domainToUpdate, getAllHostZoneNames }) {
   const handleSubmit = async () => {
     // e.preventDefault()
     try {
-      const { data } = await axios.post("http://localhost:3000/hostedZones/updateZone", {
+      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/updateZone", {
         hostedZoneId: domainToUpdate.Id,
         comment: domainInfo.comment
       })
@@ -369,7 +369,7 @@ function MainDnsPage() {
 
 
   const getAllHostZoneNames = async () => {
-    const { data } = await axios.get("http://localhost:3000/hostedZones/listAllZone")
+    const { data } = await axios.get("https://dns-manager-s2o7.onrender.com/hostedZones/listAllZone")
     if (data.success) {
       data.message.HostedZones.map((record) => {
         record.Name = unformatUrl(record.Name)
@@ -390,7 +390,7 @@ function MainDnsPage() {
 
   const deleteDomain = async (hId) => {
     try {
-      const { data } = await axios.post("http://localhost:3000/hostedZones/deleteZone", {
+      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/deleteZone", {
         hostedZoneId: hId
       })
       if (data.success) {
@@ -465,7 +465,7 @@ function MainDnsPage() {
   const uploadHostedZones = async (domainInfo) => {
     console.log(domainInfo)
     try {
-      const { data } = await axios.post("http://localhost:3000/hostedZones/createZone", {
+      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/createZone", {
         domainName: domainInfo.domainName,
         description: (domainInfo.Comment).length < 0 ? "" : domainInfo.Comment,
         isPrivate: false

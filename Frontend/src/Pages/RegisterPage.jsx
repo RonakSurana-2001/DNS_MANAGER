@@ -26,7 +26,7 @@ function RegisterPage() {
     const handleSubmit=async (e)=>{
         e.preventDefault();
         try{
-            const {data}=await axios.post("http://localhost:3000/user/userRegister",{
+            const {data}=await axios.post("https://dns-manager-s2o7.onrender.com/user/userRegister",{
                 username:userInfo.username,
                 email:userInfo.email,
                 password:userInfo.password,

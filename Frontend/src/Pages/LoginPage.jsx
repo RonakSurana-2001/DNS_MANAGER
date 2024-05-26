@@ -34,7 +34,7 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("http://localhost:3000/user/userLogin", {
+      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/user/userLogin", {
         email: userInfo.email,
         password: userInfo.password,
       })

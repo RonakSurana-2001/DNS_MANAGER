@@ -45,7 +45,7 @@ function Modal({ show, onClose, getAllRecordNames }) {
     const dns = domainInfo.recordValue.split(',');
     const formattedRecords = dns.map(record => ({ Value: record }));
     try {
-      const { data } = await axios.post("http://localhost:3000/dnsRecords/createRecord", {
+      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/dnsRecords/createRecord", {
         dnsName: domainInfo.domainName,
         recordValue: formattedRecords,
         ttl: Number(domainInfo.ttl),
@@ -219,7 +219,7 @@ function UpdateModal({ show, onClose, getAllRecordNames, updateModalInfo }) {
     const dns = domainInfo.recordValue.split(',');
     const formattedRecords = dns.map(record => ({ Value: record }));
     try {
-      const { data } = await axios.post("http://localhost:3000/dnsRecords/updateRecord", {
+      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/dnsRecords/updateRecord", {
         dnsName: domainInfo.domainName,
         recordValue: formattedRecords,
         ttl: Number(domainInfo.ttl),
@@ -384,7 +384,7 @@ function MainRecordsPage() {
 
 
   const getAllRecordNames = async (e) => {
-    const { data } = await axios.post(`http://localhost:3000/dnsRecords/listRecords/${window.location.pathname.slice(23)}`)
+    const { data } = await axios.post(`https://dns-manager-s2o7.onrender.com/listRecords/${window.location.pathname.slice(23)}`)
     if (data.success) {
       data.message.ResourceRecordSets.map((record)=>{
         record.Name =unformatUrl(record.Name)
@@ -406,7 +406,7 @@ function MainRecordsPage() {
 
   const deleteDomain = async (record) => {
     try {
-      const { data } = await axios.post("http://localhost:3000/dnsRecords/deleteRecord", {
+      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/dnsRecords/deleteRecord", {
         dnsName: record.Name,
         recordValue: record.ResourceRecords,
         ttl: Number(record.TTL),
@@ -498,7 +498,7 @@ function MainRecordsPage() {
     const formattedRecords = dns.map(record => ({ Value: record }));
     console.log(formattedRecords)
     try {
-      const { data } = await axios.post("http://localhost:3000/dnsRecords/createRecord", {
+      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/dnsRecords/createRecord", {
         dnsName: domainInfo.domainName,
         recordValue: formattedRecords,
         ttl: Number(domainInfo.ttl),
