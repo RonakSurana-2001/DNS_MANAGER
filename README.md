@@ -50,7 +50,7 @@ npm run dev
 
 ## Note
 
-In order to upload data of domains these  parameters  
+In order to upload data of domains these follow parameters  
 ```http
 In CSV for example
 ```
@@ -72,7 +72,7 @@ In JSON for example:
 ]
 ```
 
-In order to upload data of DNS Records these parameters  
+In order to upload data of DNS Records follow these parameters  
 ```http
 In CSV for example
 ```
