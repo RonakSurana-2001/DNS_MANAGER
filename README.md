@@ -50,8 +50,8 @@ npm run dev
 
 ## Note
 
-In order to upload data of domains these follow parameters  
-```http
+In order to upload data of domains follow these  parameters  
+```
 In CSV for example
 ```
 | domainName | Type     | Comment                |
@@ -59,7 +59,7 @@ In CSV for example
 | `www.domain.com` | `Public` | `Description` |
 
 
-```http
+```
 In JSON for example:
 
 [
@@ -73,7 +73,7 @@ In JSON for example:
 ```
 
 In order to upload data of DNS Records follow these parameters  
-```http
+```
 In CSV for example
 ```
 | domainName | recordValue     | ttl                |type               |
@@ -81,7 +81,7 @@ In CSV for example
 | `subdomain` | `1.1.1.1` | `300` |`A` |
 
 
-```http
+```
 In JSON for example:
 
 [
