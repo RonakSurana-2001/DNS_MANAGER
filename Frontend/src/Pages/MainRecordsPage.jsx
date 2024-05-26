@@ -384,7 +384,7 @@ function MainRecordsPage() {
 
 
   const getAllRecordNames = async (e) => {
-    const { data } = await axios.post(`https://dns-manager-s2o7.onrender.com/listRecords/${window.location.pathname.slice(23)}`)
+    const { data } = await axios.post(`https://dns-manager-s2o7.onrender.com/dnsRecords/listRecords/${window.location.pathname.slice(23)}`)
     if (data.success) {
       data.message.ResourceRecordSets.map((record)=>{
         record.Name =unformatUrl(record.Name)
