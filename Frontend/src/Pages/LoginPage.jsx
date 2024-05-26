@@ -64,8 +64,8 @@ function LoginPage() {
           </div>
           <div className='register-container-main'>
             <form onSubmit={handleSubmit}>
-              <input type="email" name="email" placeholder='Email' value={userInfo.email} onChange={handleChange} />
-              <input type="password" name="password" placeholder='Password' value={userInfo.password} onChange={handleChange} />
+              <input type="email" name="email" placeholder='Email' value={userInfo.email} onChange={handleChange} style={{width:"70%"}}/>
+              <input type="password" name="password" placeholder='Password' value={userInfo.password} onChange={handleChange} style={{width:"70%"}}/>
               <button type='submit'>Submit</button>
             </form>
             <p>NOT A USER ? PLEASE <Link to="/register">REGISTER</Link></p>

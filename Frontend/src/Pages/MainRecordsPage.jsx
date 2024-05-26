@@ -482,6 +482,7 @@ function MainRecordsPage() {
   const conversionFn = async () => {
     const res = JSON.stringify(csvData, null, 2);
     setJsonData(res);
+    console.log(res)
     const jsonParsed = JSON.parse(res);
     console.log(jsonParsed)
     if (jsonParsed.length > 0) {
@@ -489,6 +490,7 @@ function MainRecordsPage() {
         uploadHostedZones(data)
       )
     }
+    await getAllRecordNames()
     await window.location.reload()
   };
 
@@ -527,23 +529,19 @@ function MainRecordsPage() {
       <UpdateModal show={showUpdateModal} onClose={toggleUpdateModal} getAllRecordNames={getAllRecordNames} updateModalInfo={updateModalInfo} />
 
       <div className='flex flex-col my-4 mx-3'>
-        <div className='flex flex-row space-x-3'>
-          <button style={{ backgroundColor: "orange", padding: "10px", borderRadius: "5px" }} onClick={toggleModal}>Create Record</button>
+        <div className='flex flex-row space-x-3 max-sm:flex max-sm:flex-col max-sm:justify-center max-sm:items-center'>
+          <button className="bg-yellow-400 p-2 max-sm:p-3 rounded-sm max-sm:w-1/2" onClick={toggleModal}>Create Record</button>
 
-          <div className='w-80 flex flex-row justify-between bg-slate-500'>
+          <div className='w-2/4 flex flex-row justify-between max-sm:mt-2 max-md:flex max-md:flex-col max-md:w-4/5 bg-gray-100'>
             <input
               type="file"
               onChange={UploadFn}
               style={{
-                padding: "10px",
-                width: "200px",
-                cursor: "pointer",
-                color: "black",
-                textAlign: "center",
+                padding: "10px"
               }}
             />
             <button
-              className="button"
+              className="button max-sm:mt-2"
               onClick={conversionFn}
               style={{
                 backgroundColor: "blue",
@@ -565,12 +563,12 @@ function MainRecordsPage() {
             placeholder="Search by Record Name or Value/Route traffic to..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg w-4/12"
+            className="p-2 border border-gray-300 rounded-lg max-sm:mt-2 max-sm:w-full sm:w-3/6"
           />
 
         </div>
-        <div className='mx-3 my-10'>
-          <table style={{ borderCollapse: "collapse", width: "100%" }}>
+        <div className='my-10 overflow-auto rounded-lg'>
+          <table className='w-full'>
             <thead>
               <tr style={{ border: '2px solid black' }}>
                 <th style={{ border: '2px solid black', padding: '8px' }}>Record Name</th>

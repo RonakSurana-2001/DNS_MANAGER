@@ -422,12 +422,17 @@ function MainDnsPage() {
 
   const UploadFn = (event) => {
     const file = event.target.files[0];
-    const fileType =
-      file.name.split('.').pop().toLowerCase();
-    if (fileType !== 'csv' && fileType !== 'json') {
-      toast.error('Please upload a CSV or json file.');
+    if (!file) {
+      toast.error('No file selected.');
       return;
     }
+
+    const fileType = file.name.split('.').pop().toLowerCase();
+    if (fileType !== 'csv' && fileType !== 'json') {
+      toast.error('Please upload a CSV or JSON file.');
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onload = (e) => {
@@ -436,18 +441,31 @@ function MainDnsPage() {
       if (fileType === 'csv') {
         Papa.parse(fileContent, {
           complete: (result) => {
+            console.log('Parsed CSV data:', result.data);
             setCsvData(result.data);
           },
           header: true,
         });
       } else if (fileType === 'json') {
-        const parsedData = JSON.parse(fileContent);
-        setJsonData(parsedData);
-        setCsvData(parsedData)
+        try {
+          const parsedData = JSON.parse(fileContent);
+          console.log('Parsed JSON data:', parsedData);
+          setJsonData(parsedData);
+          setCsvData(parsedData); 
+        } catch (error) {
+          toast.error('Error parsing JSON file.');
+        }
       }
     };
+    
+    reader.onerror = (e) => {
+      console.error('Error reading file:', e);
+      toast.error('Error reading file.');
+    };
+
     reader.readAsText(file);
   };
+
 
 
   const conversionFn = async () => {
@@ -459,6 +477,7 @@ function MainDnsPage() {
         uploadHostedZones(data)
       )
     }
+    await getAllHostZoneNames()
     await window.location.reload()
   };
 
@@ -500,23 +519,19 @@ function MainDnsPage() {
       <UpdateModal show={showUpdateModal} onClose={toggleUpdateModal} domainToUpdate={domainToUpdate} getAllHostZoneNames={getAllHostZoneNames} />
 
       <div className='flex flex-col my-4 mx-3'>
-        <div className='flex flex-row space-x-3'>
-          <button style={{ backgroundColor: "orange", padding: "10px", borderRadius: "5px" }} onClick={toggleModal}>Create Hosted Zones</button>
+        <div className='flex flex-row space-x-3 max-sm:flex max-sm:flex-col max-sm:justify-center max-sm:items-center'>
+          <button className="bg-yellow-400 p-2 max-sm:p-3 rounded-sm max-sm:w-1/2" onClick={toggleModal}>Create Hosted Zones</button>
 
-          <div className='w-80 flex flex-row justify-between bg-slate-500'>
+          <div className='w-2/4 flex flex-row justify-between max-sm:mt-2 max-md:flex max-md:flex-col max-md:w-4/5 bg-gray-100'>
             <input
               type="file"
               onChange={UploadFn}
               style={{
-                padding: "10px",
-                width: "200px",
-                cursor: "pointer",
-                color: "black",
-                textAlign: "center",
+                padding: "10px"
               }}
             />
             <button
-              className="button"
+              className="button max-sm:mt-2"
               onClick={conversionFn}
               style={{
                 backgroundColor: "blue",
@@ -526,23 +541,21 @@ function MainDnsPage() {
                 borderRadius: "5px",
                 cursor: "pointer",
                 fontSize: "16px"
-              }}
+              }} 
             >
               Upload
             </button>
           </div>
 
 
-          <input
-            type="text"
-            placeholder="Search domain names or comments..."
+          <input type="text" placeholder="Search domain names or comments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg w-4/12"
+            className="p-2 border border-gray-300 rounded-lg max-sm:mt-2 max-sm:w-full sm:w-3/6"
           />
         </div>
-        <div className='mx-3 my-10'>
-          <table style={{ borderCollapse: "collapse", width: "100%" }}>
+        <div className='my-10 overflow-auto rounded-lg'>
+          <table className='w-full'>
             <thead>
               <tr style={{ border: '2px solid black' }}>
                 <th style={{ border: '2px solid black', padding: '8px' }}>Hosted Domain Names</th>
@@ -553,7 +566,7 @@ function MainDnsPage() {
                 <th style={{ border: '2px solid black', padding: '8px' }}>Delete</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className=' md:text-sm'>
               {filteredDomains?.length > 0 ? (filteredDomains.map((record, index) =>
                 <tr key={index} style={{ border: '2px solid black' }}>
                   <td style={{ border: '2px solid black', padding: '8px', textAlign: 'center' }}><Link to={'/dnsRecords' + record.Id}>{record.Name}</Link></td>
