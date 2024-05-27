@@ -77,6 +77,8 @@ function Modal({ show, onClose, getAllHostZoneNames }) {
         if (data.success) {
           console.log(data.message)
           await getAllHostZoneNames()
+          toast.success("Hosted Zone Created")
+          await onClose()
         }
         else {
           console.error("Not Created")
