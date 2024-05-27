@@ -402,7 +402,7 @@ function MainDnsPage() {
       })
       if (data.success) {
         await getAllHostZoneNames()
-        toast.success("Hosted Zone deletd")
+        toast.success("Hosted Zone deleted")
       }
       else {
         toast.error("Unable to delete")
