@@ -8,7 +8,7 @@ import ReactLoading from 'react-loading';
 import Papa from 'papaparse';
 
 
-function Modal({ show, onClose }) {
+function Modal({ show, onClose,getAllHostZoneNames }) {
   if (!show) {
     return null;
   }
@@ -43,7 +43,8 @@ function Modal({ show, onClose }) {
   }, [currType]);
 
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     if (domainInfo.isPrivate == false) {
       try {
         const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/createZone", {
@@ -53,6 +54,8 @@ function Modal({ show, onClose }) {
         })
         if (data.success) {
           console.log(data.message)
+          await getAllHostZoneNames()
+          await onClose()
         }
         else {
           console.error("Not Created")
@@ -72,6 +75,7 @@ function Modal({ show, onClose }) {
         })
         if (data.success) {
           console.log(data.message)
+          await getAllHostZoneNames()
         }
         else {
           console.error("Not Created")
@@ -514,7 +518,7 @@ function MainDnsPage() {
   return (
     <>
 
-      <Modal show={showModal} onClose={toggleModal} />
+      <Modal show={showModal} onClose={toggleModal} getAllHostZoneNames={getAllHostZoneNames}/>
 
       <UpdateModal show={showUpdateModal} onClose={toggleUpdateModal} domainToUpdate={domainToUpdate} getAllHostZoneNames={getAllHostZoneNames} />
 
