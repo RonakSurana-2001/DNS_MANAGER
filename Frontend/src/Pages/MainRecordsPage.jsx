@@ -495,12 +495,12 @@ function MainRecordsPage() {
   };
 
   const uploadHostedZones = async (domainInfo) => {
-    console.log(domainInfo.domainName.trim())
+    // console.log(domainInfo.domainName.trim())
     const dns = domainInfo.recordValue.split(',');
     const formattedRecords = dns.map(record => ({ Value: record }));
-    console.log(formattedRecords)
+    // console.log(formattedRecords)
     try {
-      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/dnsRecords/createRecord", {
+      const { data } = await axios.post("http://localhost:3000/dnsRecords/createRecord", {
         dnsName: domainInfo.domainName.trim(),
         recordValue: formattedRecords,
         ttl: Number(domainInfo.ttl),
@@ -511,7 +511,7 @@ function MainRecordsPage() {
         console.log(data.message)
       }
       else {
-        console.error("Not Created")
+        console.error(data.message)
       }
     } catch (error) {
       console.log("Some Error Occurred")

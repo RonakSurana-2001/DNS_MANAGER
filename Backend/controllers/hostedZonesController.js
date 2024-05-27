@@ -118,6 +118,8 @@ const createPrivateHostedZone = async (req, res) => {
 
 const deleteHostedZone = async (req, res) => {
 
+    console.log(req.body)
+
     const hzData = zod.object({
         hostedZoneId: zod.string({
             required_error: "Id is required",
