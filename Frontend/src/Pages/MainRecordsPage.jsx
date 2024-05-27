@@ -252,7 +252,7 @@ function UpdateModal({ show, onClose, getAllRecordNames, updateModalInfo }) {
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Create Record
+              Edit Record
             </h3>
             <button
               type="button"
