@@ -13,6 +13,7 @@ const client = new Route53Client(config);
 
 const createHostedZone = async (req, res) => {
 
+
     console.log(req.body)
 
     const hzData = zod.object({

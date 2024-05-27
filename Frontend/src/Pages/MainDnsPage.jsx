@@ -8,7 +8,7 @@ import ReactLoading from 'react-loading';
 import Papa from 'papaparse';
 
 
-function Modal({ show, onClose,getAllHostZoneNames }) {
+function Modal({ show, onClose, getAllHostZoneNames }) {
   if (!show) {
     return null;
   }
@@ -457,13 +457,13 @@ function MainDnsPage() {
           const parsedData = JSON.parse(fileContent);
           console.log('Parsed JSON data:', parsedData);
           setJsonData(parsedData);
-          setCsvData(parsedData); 
+          setCsvData(parsedData);
         } catch (error) {
           toast.error('Error parsing JSON file.');
         }
       }
     };
-    
+
     reader.onerror = (e) => {
       console.error('Error reading file:', e);
       toast.error('Error reading file.');
@@ -487,22 +487,48 @@ function MainDnsPage() {
     await window.location.reload()
   };
 
+  const stringToBoolean = (str) => {
+    return str.toLowerCase() === "true";
+  };
+
   const uploadHostedZones = async (domainInfo) => {
-    console.log(domainInfo)
     try {
-      const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/createZone", {
-        domainName: domainInfo.domainName,
-        description: (domainInfo.Comment).length < 0 ? "" : domainInfo.Comment,
-        isPrivate: false
-      })
-      if (data.success) {
-        console.log(data.message)
+      if (stringToBoolean(domainInfo.Type) == false) {
+        const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/createZone", {
+          domainName: domainInfo.domainName,
+          description: domainInfo.Comment,
+          isPrivate: stringToBoolean(domainInfo.Type)
+        })
+        if (data.success) {
+          // console.log(data)
+          console.log(data.message)
+        }
+        else {
+          // console.log(data)
+          console.error("Not Created")
+        }
       }
       else {
-        console.error("Not Created")
+        try {
+          const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/createZone/privateZone", {
+            domainName: domainInfo.domainName,
+            description: domainInfo.Comment,
+            isPrivate: stringToBoolean(domainInfo.Type),
+            vpcId: domainInfo.vpcId,
+            vpcRegion: domainInfo.vpcRegion
+          })
+          if (data.success) {
+            console.log(data.message)
+          }
+          else {
+            console.error("Not Created")
+          }
+        } catch (error) {
+          console.log("Some Error Occurred")
+        }
       }
     } catch (error) {
-      console.log("Some Error Occurred")
+      console.error(error)
     }
   }
 
@@ -520,7 +546,7 @@ function MainDnsPage() {
   return (
     <>
 
-      <Modal show={showModal} onClose={toggleModal} getAllHostZoneNames={getAllHostZoneNames}/>
+      <Modal show={showModal} onClose={toggleModal} getAllHostZoneNames={getAllHostZoneNames} />
 
       <UpdateModal show={showUpdateModal} onClose={toggleUpdateModal} domainToUpdate={domainToUpdate} getAllHostZoneNames={getAllHostZoneNames} />
 
@@ -547,7 +573,7 @@ function MainDnsPage() {
                 borderRadius: "5px",
                 cursor: "pointer",
                 fontSize: "16px"
-              }} 
+              }}
             >
               Upload
             </button>
