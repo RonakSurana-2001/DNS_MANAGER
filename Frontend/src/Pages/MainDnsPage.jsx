@@ -256,7 +256,7 @@ function UpdateModal({ show, onClose, domainToUpdate, getAllHostZoneNames }) {
     }));
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/hostedZones/updateZone", {
@@ -265,8 +265,8 @@ function UpdateModal({ show, onClose, domainToUpdate, getAllHostZoneNames }) {
       })
       if (data.success) {
         await getAllHostZoneNames()
-        console.log(data.message)
-        await onClose()
+        toast.success("Updated Successfully")
+        onClose()
       }
       else {
         console.error("Not Created")

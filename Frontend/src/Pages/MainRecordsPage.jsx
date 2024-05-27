@@ -482,9 +482,9 @@ function MainRecordsPage() {
   const conversionFn = async () => {
     const res = JSON.stringify(csvData, null, 2);
     setJsonData(res);
-    console.log(res)
+    // console.log(res)
     const jsonParsed = JSON.parse(res);
-    console.log(jsonParsed)
+    // console.log(jsonParsed)
     if (jsonParsed.length > 0) {
       jsonParsed.map((data) =>
         uploadHostedZones(data)
@@ -495,13 +495,13 @@ function MainRecordsPage() {
   };
 
   const uploadHostedZones = async (domainInfo) => {
-    console.log(domainInfo)
+    console.log(domainInfo.domainName.trim())
     const dns = domainInfo.recordValue.split(',');
     const formattedRecords = dns.map(record => ({ Value: record }));
     console.log(formattedRecords)
     try {
       const { data } = await axios.post("https://dns-manager-s2o7.onrender.com/dnsRecords/createRecord", {
-        dnsName: domainInfo.domainName,
+        dnsName: domainInfo.domainName.trim(),
         recordValue: formattedRecords,
         ttl: Number(domainInfo.ttl),
         type: domainInfo.type,
