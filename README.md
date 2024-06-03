@@ -7,7 +7,7 @@ DNS Manager is web application for the management of domains and DNS records in 
 
 **Client:** React, TailwindCSS
 
-**Server:** Node, Express
+**Server:** Node, Express, Zod
 
 **Database:** MongoDB
 
