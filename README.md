@@ -22,6 +22,11 @@ DNS Manager is web application for the management of domains and DNS records in 
 - Filters and search options for easy bulk data navigation
 -  Integration of CSV or JSON bulk uploads for domain/records data
 -  Secure user authentication and authorization
+
+## Video Demostration 
+
+https://drive.google.com/file/d/1zA8NxedMcwJYX7Wug4E3rinPVfHYfNTV/view?usp=drive_link
+
 ## Installation
 
 Clone the Repository
